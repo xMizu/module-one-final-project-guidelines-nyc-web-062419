@@ -11,6 +11,12 @@ def self.news
     response_hash = JSON.parse(response_string)
 end
 
+def self.news_list
+    self.news.map do |data,info|
+        data == "articles"               
+    end
+end
+
 
 
 
