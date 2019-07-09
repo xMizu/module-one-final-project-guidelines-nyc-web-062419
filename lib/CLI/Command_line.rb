@@ -1,3 +1,6 @@
+class Cli
+
+  attr_accessor :user , :article
 
   def welcome
     puts "Welcome to Flatiron News"
@@ -21,7 +24,6 @@ def create_username
   if User.find_by(name: new_user.downcase.to_s) == nil
       @user = User.create(name: new_user.downcase.to_s)
     puts "Welcome #{new_user.downcase.capitalize}"
-
     main_menu
   else
     puts "Sorry, that username is taken. Please log in or enter a new username"
@@ -84,25 +86,34 @@ end
     menu.choice 'Browse more stories ', -> {go_back}
   end
   if user_response == "Save"
-  Favorite.create(user_id: @user.id,article_id: selected_article.id)
-  puts "Saved!"
-  binding.pry
-  main_menu
-end
+    if Favorite.find_by(user_id: @user.id,article_id: selected_article.id)
+      puts "Already saved!"
+    else Favorite.create(user_id: @user.id,article_id: selected_article.id)
+      puts "Saved!"
+    end
+  end
+  new_search
 end
 
 def saved_articles
   @user.articles.each do |articles|
     puts articles.title
   end
+  prompt = TTY::Prompt.new
+  prompt.select('') do |menu|
+    menu.choice 'Return to menu ', -> { main_menu }
+  end
 end
-
-
-
 
 
 def go_back
   trending
+end
+
+def articles_by_keyword
+  puts "Insert keyword"
+  keyword = gets.chomp.downcase
+
 end
 
 # def trending
@@ -122,3 +133,6 @@ end
 #
 # end
 # end
+
+
+end
