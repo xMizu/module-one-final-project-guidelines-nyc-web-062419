@@ -21,9 +21,9 @@ ActiveRecord::Schema.define(version: 20190709142243) do
     t.datetime "publishedAt"
   end
 
-  create_table "favouritelists", force: :cascade do |t|
+  create_table "favorites", force: :cascade do |t|
     t.integer "user_id"
-    t.integer "articles_id"
+    t.integer "article_id"
   end
 
   create_table "users", force: :cascade do |t|
