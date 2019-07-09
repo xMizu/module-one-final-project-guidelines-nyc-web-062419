@@ -112,7 +112,13 @@ end
 
 def articles_by_keyword
   puts "Insert keyword"
-  keyword = gets.chomp.downcase
+  keyword = gets.chomp
+  Article.all_titles.each do |title|
+    if title.include?(keyword)
+      puts title
+    end
+  end
+
 end
 
 # def trending
