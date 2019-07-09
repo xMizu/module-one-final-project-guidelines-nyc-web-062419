@@ -113,7 +113,6 @@ end
 def articles_by_keyword
   puts "Insert keyword"
   keyword = gets.chomp.downcase
-
 end
 
 # def trending
