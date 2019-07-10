@@ -1,8 +1,8 @@
-#Ruby QuickNews
+# Ruby QuickNews
 
 This a program created to connect users with the latest trending news in various countries (United States, United Kingdom, and Canada). We also implemented a comment section for our users to get to know one another and are able to be informed on the go. 
 
-##Features
+## Features
  - Create User profile
  - Dynamic Search engine using News API
  - Search Filtering by keyword or most recent
@@ -11,15 +11,15 @@ This a program created to connect users with the latest trending news in various
  - User able to comment on articles 
  - Uses menu selection to navigate through program
 
-##Installation
+## Installation
 
 run `$bundle install` 
 
-###also:
+### also: 
 
 run `$rake db:seed`
 
-##API
+## API
 - newsapi.org 
 
 
