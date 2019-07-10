@@ -50,6 +50,7 @@ end
     prompt.select('') do |menu|
     menu.choice 'Saved Articles', -> { saved_articles }
     menu.choice 'Search for new articles', -> { new_search }
+    menu.choice 'Logout', -> { welcome }
     menu.choice 'Exit', -> { exit }
   end
 end
@@ -62,43 +63,26 @@ end
     menu.choice 'Trending Stories', -> { trending }
     menu.choice 'Search by Description', -> { articles_by_description }
     menu.choice 'Search by Keyword', -> { articles_by_keyword }
-    menu.choice 'Exit back to menu ', -> { main_menu }
+    menu.choice 'Return to main menu ', -> { main_menu }
     menu.choice 'Exit', -> { exit }
   end
 end
 
 def trending
   prompt = TTY::Prompt.new
-  their_choice_or_answer = prompt.select('') do |menu|
+  answer = prompt.select('') do |menu|
   Article.all.each do |articles|
   menu.choice "#{articles.title}"
-  # binding.pry
-    # Article.find_by(title: articles.title).content
 end
+  menu.choice "Go back", -> {new_search} 
 end
-  selected_article = Article.find_by(title: their_choice_or_answer)
-  puts "Article Description"
-  puts selected_article.description
-  puts "Would you like to save this story?"
-  prompt = TTY::Prompt.new
-  user_response = prompt.select('') do |menu|
-    menu.choice 'Save'
-    menu.choice 'Browse more stories ', -> {go_back}
+  save answer
+  prompt.select('') do |menu|
+    menu.choice "New search", -> {new_search}  
+    menu.choice "Go back", -> {trending} 
   end
-  if user_response == "Save"
-    if Favorite.find_by(user_id: @user.id,article_id: selected_article.id)
-      puts "Already saved!"
-    else Favorite.create(user_id: @user.id,article_id: selected_article.id)
-      puts "Saved!"
-    end
-  end
-  new_search
 end
 
-
-def go_back
-  trending
-end
 
 def articles_by_keyword
   puts "Insert keyword"
@@ -117,22 +101,7 @@ def articles_by_keyword
       end 
     end
   end
-      selected_article = Article.find_by(title: answer)
-  puts "Article Description"
-  puts selected_article.description
-  puts "Would you like to save this story?"
-  prompt = TTY::Prompt.new
-  user_response = prompt.select('') do |menu|
-    menu.choice 'Save'
-    menu.choice 'Browse more stories ', -> {go_back}
-  end
-  if user_response == "Save"
-    if Favorite.find_by(user_id: @user.id,article_id: selected_article.id)
-      puts "Already saved!"
-    else Favorite.create(user_id: @user.id,article_id: selected_article.id)
-      puts "Saved!"
-    end
-  end
+  save answer
   saved_articles
 end
 
@@ -146,42 +115,44 @@ end
 
 def saved_articles
   prompt = TTY::Prompt.new
-  prompt.select('') do |menu|
+  respsonse = prompt.select('') do |menu|
     User.find_by(id: @user.id).articles.each do |articles|
-      menu.choice articles.title, articles.description
+      menu.choice articles.title
     end
-  end
-  prompt = TTY::Prompt.new
-  prompt.select('') do |menu|
     menu.choice 'Return to menu ', -> { main_menu }
+  end
+  article = Article.find_by(title: respsonse)
+  puts article.title
+  puts "------------------"
+  puts article.description
+  prompt.select('') do |menu|
+    main_menu
+  end
+end
+
+
+def save(answer)
+  selected_article = Article.find_by(title: answer)
+  puts "Article Description"
+  puts selected_article.description
+  puts "Would you like to save this story?"
+  prompt = TTY::Prompt.new
+  user_response = prompt.select('') do |menu|
+    menu.choice 'Save'
+    menu.choice 'New search', -> {new_search}
+  end
+  if user_response == "Save"
+    if Favorite.find_by(user_id: @user.id,article_id: selected_article.id)
+      puts "Already saved!"
+    else Favorite.create(user_id: @user.id,article_id: selected_article.id)
+      puts "Saved!"
+    end
   end
 end
  
 
-  # if search.empty?
-  #   puts "No articles found, please try again"
-  # else
-  #   puts search
-  # end
 
 
-# def trending
-#   trending_list = Article.all.map do |articles|
-#     puts "#{articles.id}. articles|
-#
-#
-#
-#
-#   #   puts "#{index + 1}. " + articles.title
-#   # end
-#   # puts "Select the article you want"
-#   # answer = gets.chomp.to_i
-#   # binding.pry
-#   # trending_list.select do |trending|
-#   #   trending_index = answer - 1
-#
-# end
-# end
 
 
 end
