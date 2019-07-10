@@ -60,7 +60,7 @@ end
     prompt = TTY::Prompt.new
     prompt.select('') do |menu|
     menu.choice 'Trending Stories', -> { trending }
-    menu.choice 'Search by Category', -> { articles_by_category }
+    menu.choice 'Search by Description', -> { articles_by_description }
     menu.choice 'Search by Keyword', -> { articles_by_keyword }
     menu.choice 'Exit back to menu ', -> { main_menu }
     menu.choice 'Exit', -> { exit }
@@ -95,16 +95,6 @@ end
   new_search
 end
 
-def saved_articles
-  @user.articles.each do |articles|
-    puts articles.title
-  end
-  prompt = TTY::Prompt.new
-  prompt.select('') do |menu|
-    menu.choice 'Return to menu ', -> { main_menu }
-  end
-end
-
 
 def go_back
   trending
@@ -112,14 +102,66 @@ end
 
 def articles_by_keyword
   puts "Insert keyword"
-  keyword = gets.chomp
-  Article.all_titles.each do |title|
-    if title.include?(keyword)
-      puts title
+  keyword = gets.chomp.downcase
+  search = Article.all_titles.select do |title|
+    title.downcase.include?(keyword)
+  end
+  if search.empty?
+    puts "No articles found, please try again"
+    new_search
+  else
+    prompt = TTY::Prompt.new
+    answer = prompt.select('') do |menu|
+      search.each do |search_result|
+        menu.choice search_result 
+      end 
     end
   end
-
+      selected_article = Article.find_by(title: answer)
+  puts "Article Description"
+  puts selected_article.description
+  puts "Would you like to save this story?"
+  prompt = TTY::Prompt.new
+  user_response = prompt.select('') do |menu|
+    menu.choice 'Save'
+    menu.choice 'Browse more stories ', -> {go_back}
+  end
+  if user_response == "Save"
+    if Favorite.find_by(user_id: @user.id,article_id: selected_article.id)
+      puts "Already saved!"
+    else Favorite.create(user_id: @user.id,article_id: selected_article.id)
+      puts "Saved!"
+    end
+  end
+  saved_articles
 end
+
+def articles_by_description
+  puts "Insert keyword"
+  keyword = gets.chomp.to_s
+  search = Article.all.select do |articles|
+    articles.description.include?(keyword)
+  end
+end
+
+def saved_articles
+  prompt2 = TTY::Prompt.new
+  User.find_by(id: @user.id).articles.map do |articles|
+    puts articles.title
+  end
+  prompt = TTY::Prompt.new
+  prompt.select('') do |menu|
+    menu.choice 'Return to menu ', -> { main_menu }
+  end
+end
+ 
+
+  # if search.empty?
+  #   puts "No articles found, please try again"
+  # else
+  #   puts search
+  # end
+
 
 # def trending
 #   trending_list = Article.all.map do |articles|
