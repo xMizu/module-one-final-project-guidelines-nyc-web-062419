@@ -144,14 +144,6 @@ def articles_by_keyword
   saved_articles
 end
 
-# def articles_by_description
-#   puts "Insert keyword"
-#   keyword = gets.chomp.to_s
-#   search = Article.all.select do |articles|
-#     articles.description.include?(keyword)
-#   end
-# end
-
 def saved_articles
   system "clear"
   puts header.call "Here are your favorited stories "
