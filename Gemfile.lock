@@ -76,6 +76,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  pastel
   pry
   require_all
   rest-client
