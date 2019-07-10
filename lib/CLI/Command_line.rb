@@ -20,10 +20,10 @@ class Cli
 
 def create_username
     puts "Please enter the username you would like to create"
-    new_user = gets.chomp
-  if User.find_by(name: new_user.downcase.to_s) == nil
-      @user = User.create(name: new_user.downcase.to_s)
-    puts "Welcome #{new_user.downcase.capitalize}"
+    new_user = gets.chomp.downcase.to_s
+  if User.find_by(name: new_user) == nil
+      @user = User.create(name: new_user)
+    puts "Welcome #{new_user.capitalize}"
     main_menu
   else
     puts "Sorry, that username is taken. Please log in or enter a new username"
@@ -33,12 +33,12 @@ end
 
 def login
     puts "Please enter the username"
-    existing_user = gets.chomp
-    if User.find_by(name: existing_user.downcase.to_s) == nil
+    existing_user = gets.chomp.downcase.to_s
+    if User.find_by(name: existing_user) == nil
     puts "Username not found. Please create an account or try again"
     login_menu
   else
-    @user = User.find_by(name: existing_user.downcase.to_s)
+    @user = User.find_by(name: existing_user)
     puts "Welcome #{existing_user.capitalize}"
     main_menu
   end
@@ -48,7 +48,7 @@ end
     prompt = TTY::Prompt.new
     puts "Please select a menu option"
     prompt.select('') do |menu|
-    menu.choice 'Saved Articles', -> { saved_articles }
+    menu.choice "Saved Articles (#{user.favorites.count})", -> { saved_articles }
     menu.choice 'Search for new articles', -> { new_search }
     menu.choice 'Logout', -> { welcome }
     menu.choice 'Exit', -> { exit }
@@ -60,7 +60,7 @@ end
   def new_search
     prompt = TTY::Prompt.new
     prompt.select('') do |menu|
-    menu.choice 'Trending Stories', -> { trending }
+    menu.choice "Trending Stories (#{Article.sort_by_recent.count})", -> { trending }
     # menu.choice 'Search by Description', -> { articles_by_description }
     menu.choice 'Search by Keyword', -> { articles_by_keyword }
     menu.choice 'Return to main menu ', -> { main_menu }
