@@ -8,12 +8,12 @@ class Article < ActiveRecord::Base
 
     def self.all_titles
         self.all.map do |article|
-            article.title 
+            article.title
         end
     end
 
     def self.sort_by_recent
-        self.order(publishedAt: :desc).limit(10)
+        self.order(publishedAt: :desc).limit(25)
     end
 
 

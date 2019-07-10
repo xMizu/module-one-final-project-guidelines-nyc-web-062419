@@ -3,6 +3,7 @@ class Cli
   attr_accessor :user , :article
 
   def welcome
+    system 'clear'
     puts "Welcome to Flatiron News"
     puts "Please login or create a new username"
     login_menu
@@ -19,27 +20,36 @@ class Cli
 
 
 def create_username
+  system "clear"
     puts "Please enter the username you would like to create"
+    puts "-----------------"
     new_user = gets.chomp.downcase.to_s
   if User.find_by(name: new_user) == nil
       @user = User.create(name: new_user)
+      system "clear"
     puts "Welcome #{new_user.capitalize}"
+    puts "-----------------"
     main_menu
   else
+    system "clear"
     puts "Sorry, that username is taken. Please log in or enter a new username"
     login_menu
   end
 end
 
 def login
+  system "clear"
     puts "Please enter the username"
+    puts "-----------------"
     existing_user = gets.chomp.downcase.to_s
     if User.find_by(name: existing_user) == nil
     puts "Username not found. Please create an account or try again"
     login_menu
   else
     @user = User.find_by(name: existing_user)
+    system "clear"
     puts "Welcome #{existing_user.capitalize}"
+    puts "-------------"
     main_menu
   end
 end
@@ -58,6 +68,9 @@ end
 
 
   def new_search
+    system "clear"
+    puts "Please select a search option"
+    puts "-----------------"
     prompt = TTY::Prompt.new
     prompt.select('') do |menu|
     menu.choice "Trending Stories (#{Article.sort_by_recent.count})", -> { trending }
@@ -69,17 +82,21 @@ end
 end
 
 def trending
+  system "clear"
+  puts "Here are todays trending stories"
+  puts "-----------------"
   prompt = TTY::Prompt.new
-  answer = prompt.select('') do |menu|
+  answer = prompt.select(" ", " ", per_page: 200) do |menu|
   Article.sort_by_recent.each do |articles|
   menu.choice "#{articles.title}"
 end
-  menu.choice "Go back", -> {new_search} 
+  menu.choice "Go back", -> {new_search}
 end
   save answer
   prompt.select('') do |menu|
-    menu.choice "New search", -> {new_search}  
-    menu.choice "Go back", -> {trending} 
+    menu.choice "New search", -> {new_search}
+    menu.choice "Go back", -> {trending}
+    menu.choice "See favorites", -> {saved_articles}
   end
 end
 
@@ -97,8 +114,8 @@ def articles_by_keyword
     prompt = TTY::Prompt.new
     answer = prompt.select('') do |menu|
       search.each do |search_result|
-        menu.choice search_result 
-      end 
+        menu.choice search_result
+      end
     end
   end
   save answer
@@ -114,6 +131,10 @@ end
 # end
 
 def saved_articles
+  system "clear"
+  puts "Here are your favorited stories "
+  puts "-----------------"
+  puts " "
   prompt = TTY::Prompt.new
   respsonse = prompt.select('') do |menu|
     User.find_by(id: @user.id).articles.each do |article|
@@ -132,8 +153,15 @@ end
 
 def save(answer)
   selected_article = Article.find_by(title: answer)
-  puts "Article Description"
+  system "clear"
+  puts "Title"
+  puts "-----------------"
+  puts "#{selected_article.title}"
+  puts " "
+  puts "Article Description:"
+  puts "-----------------"
   puts selected_article.description
+  puts " "
   puts "Would you like to save this story?"
   prompt = TTY::Prompt.new
   user_response = prompt.select('') do |menu|
@@ -148,16 +176,17 @@ def save(answer)
     end
   end
 end
- 
+
 def display article
+  puts "Title"
+  puts "-----------------"
   @article = article
   puts article.title
-  puts "------------------"
+  puts " "
+  puts "Description"
+  puts "-----------------"
   if article.description.class == String
     puts article.description
-  end
-  if article.content.class == String
-    puts article.content
   end
 end
 
