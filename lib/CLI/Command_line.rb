@@ -71,7 +71,7 @@ end
 def trending
   prompt = TTY::Prompt.new
   answer = prompt.select('') do |menu|
-  Article.all.each do |articles|
+  Article.sort_by_recent.each do |articles|
   menu.choice "#{articles.title}"
 end
   menu.choice "Go back", -> {new_search} 
@@ -122,11 +122,21 @@ def saved_articles
     menu.choice 'Return to menu ', -> { main_menu }
   end
   article = Article.find_by(title: respsonse)
-  puts article.title
-  puts "------------------"
-  puts article.description
-  prompt.select('') do |menu|
-    main_menu
+    puts article.title
+    puts "------------------"
+    puts article.description
+    puts article.content
+    puts "read more online?"
+  online = prompt.select('') do |menu|
+    menu.choice "yes"
+    menu.choice "no", -> {saved_articles}
+    end
+  if online == "yes"
+    system "open", article.url
+  else
+    prompt.select('') do |menu|
+      main_menu
+    end
   end
 end
 

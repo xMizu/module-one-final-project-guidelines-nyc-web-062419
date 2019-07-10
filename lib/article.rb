@@ -12,6 +12,10 @@ class Article < ActiveRecord::Base
         end
     end
 
+    def self.sort_by_recent
+        self.order(publishedAt: :desc).limit(10)
+    end
+
 
 
 
