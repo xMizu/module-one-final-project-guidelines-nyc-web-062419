@@ -61,7 +61,7 @@ end
     prompt = TTY::Prompt.new
     prompt.select('') do |menu|
     menu.choice 'Trending Stories', -> { trending }
-    menu.choice 'Search by Description', -> { articles_by_description }
+    # menu.choice 'Search by Description', -> { articles_by_description }
     menu.choice 'Search by Keyword', -> { articles_by_keyword }
     menu.choice 'Return to main menu ', -> { main_menu }
     menu.choice 'Exit', -> { exit }
@@ -105,39 +105,28 @@ def articles_by_keyword
   saved_articles
 end
 
-def articles_by_description
-  puts "Insert keyword"
-  keyword = gets.chomp.to_s
-  search = Article.all.select do |articles|
-    articles.description.include?(keyword)
-  end
-end
+# def articles_by_description
+#   puts "Insert keyword"
+#   keyword = gets.chomp.to_s
+#   search = Article.all.select do |articles|
+#     articles.description.include?(keyword)
+#   end
+# end
 
 def saved_articles
   prompt = TTY::Prompt.new
   respsonse = prompt.select('') do |menu|
-    User.find_by(id: @user.id).articles.each do |articles|
-      menu.choice articles.title
+    User.find_by(id: @user.id).articles.each do |article|
+      menu.choice article.title, -> {display article}
     end
-    menu.choice 'Return to menu ', -> { main_menu }
-  end
-  article = Article.find_by(title: respsonse)
-    puts article.title
-    puts "------------------"
-    puts article.description
-    puts article.content
-    puts "read more online?"
-  online = prompt.select('') do |menu|
-    menu.choice "yes"
-    menu.choice "no", -> {saved_articles}
+      menu.choice 'Return to menu ', -> { main_menu }
     end
-  if online == "yes"
-    system "open", article.url
-  else
     prompt.select('') do |menu|
-      main_menu
+      menu.choice "Read more online", -> {system "open", article.url}
+      menu.choice "Go back", -> {saved_articles}
+      menu.choice "Remove from favorites", -> {Favorite.delete(Favorite.where(user_id: @user.id,article_id: @article.id))}
     end
-  end
+  saved_articles
 end
 
 
@@ -160,7 +149,17 @@ def save(answer)
   end
 end
  
-
+def display article
+  @article = article
+  puts article.title
+  puts "------------------"
+  if article.description.class == String
+    puts article.description
+  end
+  if article.content.class == String
+    puts article.content
+  end
+end
 
 
 
