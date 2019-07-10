@@ -145,9 +145,11 @@ def articles_by_description
 end
 
 def saved_articles
-  prompt2 = TTY::Prompt.new
-  User.find_by(id: @user.id).articles.map do |articles|
-    puts articles.title
+  prompt = TTY::Prompt.new
+  prompt.select('') do |menu|
+    User.find_by(id: @user.id).articles.each do |articles|
+      menu.choice articles.title, articles.description
+    end
   end
   prompt = TTY::Prompt.new
   prompt.select('') do |menu|
