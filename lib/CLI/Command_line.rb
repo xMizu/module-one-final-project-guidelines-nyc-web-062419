@@ -55,6 +55,9 @@ def login
 end
 
   def main_menu
+    system "clear"
+    puts "Welcome #{user.name.capitalize}"
+    puts "-------------"
     prompt = TTY::Prompt.new
     puts "Please select a menu option"
     prompt.select('') do |menu|
@@ -102,17 +105,24 @@ end
 
 
 def articles_by_keyword
+  system "clear"
   puts "Insert keyword"
   keyword = gets.chomp.downcase
   search = Article.all_titles.select do |title|
     title.downcase.include?(keyword)
   end
   if search.empty?
+    system "clear"
     puts "No articles found, please try again"
-    new_search
+    puts " "
+    prompt = TTY::Prompt.new
+    prompt.select('') do |menu|
+      menu.choice 'Search by Keyword', -> { articles_by_keyword }
+      menu.choice 'Return to main menu ', -> { main_menu }
+    end
   else
     prompt = TTY::Prompt.new
-    answer = prompt.select('') do |menu|
+    answer = prompt.select('', per_page: 200) do |menu|
       search.each do |search_result|
         menu.choice search_result
       end
@@ -136,7 +146,7 @@ def saved_articles
   puts "-----------------"
   puts " "
   prompt = TTY::Prompt.new
-  respsonse = prompt.select('') do |menu|
+  respsonse = prompt.select('', per_page: 200) do |menu|
     User.find_by(id: @user.id).articles.each do |article|
       menu.choice article.title, -> {display article}
     end
@@ -178,6 +188,7 @@ def save(answer)
 end
 
 def display article
+  system "clear"
   puts "Title"
   puts "-----------------"
   @article = article
