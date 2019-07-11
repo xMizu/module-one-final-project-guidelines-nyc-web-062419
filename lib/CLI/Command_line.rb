@@ -89,10 +89,28 @@ end
     puts " "
     Prompt.select('') do |menu|
     menu.choice (option.call "Trending Stories (#{Article.sort_by_recent.count})"), -> { trending }
+    menu.choice (option.call "All Stories (#{Article.sort_all.count})"), -> { all_stories }
     # menu.choice 'Search by Description', -> { articles_by_description }
     menu.choice (option.call 'Search by Keyword'), -> { articles_by_keyword }
     menu.choice (option.call 'Return to main menu'), -> { main_menu }
     menu.choice (option.call 'Exit'), -> { exit }
+  end
+end
+
+
+def all_stories
+  system "clear"
+  puts header.call "Here are all stories"
+  Prompt.select(" ", per_page: 40) do |menu|
+    Article.sort_all.each do |articles|
+      menu.choice (selection.call "#{articles.title}"), -> {save articles}
+    end
+    menu.choice (option.call "Go back"), -> {new_search}
+  end
+  Prompt.select('') do |menu|
+    menu.choice (option.call "New search"), -> {new_search}
+    menu.choice (option.call "Go back"), -> {trending}
+    menu.choice (option.call "See favorites"), -> {saved_articles}
   end
 end
 
@@ -118,7 +136,7 @@ def articles_by_keyword
   system "clear"
   puts "Insert keyword"
   keyword = gets.chomp.downcase
-  search = Article.sort_by_recent.select do |article|
+  search = Article.all.select do |article|
     article.title.downcase.include?(keyword)
   end
   if search.empty?
@@ -134,7 +152,6 @@ def articles_by_keyword
       search.each do |search_result|
         menu.choice (selection.call search_result.title)
       end
-      puts " "
       menu.choice (option.call 'Search by Keyword'), -> { articles_by_keyword }
       menu.choice (option.call 'Return to main menu'), -> { main_menu }
     end

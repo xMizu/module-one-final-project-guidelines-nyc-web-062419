@@ -16,7 +16,8 @@ class Article < ActiveRecord::Base
         self.order(publishedAt: :desc).limit(25)
     end
 
-
-
+    def self.sort_all
+        self.order(publishedAt: :desc)
+    end
 
 end
