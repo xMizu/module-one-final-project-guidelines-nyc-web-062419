@@ -84,6 +84,7 @@ end
 
   def settings
     system "clear"
+    puts header.call "Settings"
     Prompt.select('') do |menu|
       menu.choice (option.call "Change Name"), -> { change_name }
       menu.choice (option.call 'Delete Account'), -> { delete_account }
@@ -137,7 +138,7 @@ def all_stories
   end
   Prompt.select('') do |menu|
     menu.choice (option.call "New search"), -> {new_search}
-    menu.choice (option.call "Go back"), -> {trending}
+    menu.choice (option.call "Go back"), -> {all_stories}
     menu.choice (option.call "See favorites"), -> {saved_articles}
   end
 end
@@ -187,6 +188,7 @@ def articles_by_keyword
 
   end
   save answer
+  display article
   Prompt.select('') do |menu|
     menu.choice (option.call "See Favorites"), -> {saved_articles}
     menu.choice (option.call "Go back"), -> {articles_by_keyword}
