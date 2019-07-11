@@ -8,7 +8,7 @@ class Comment < ActiveRecord::Base
   Pastel = Pastel.new
 
   def self.comment_by_article article
-    self.all.where(article_id: article.id).each do |ci|
+    self.all.where(article_id: article.id).order(comment_timestamp: :desc).each do |ci|
       puts "#{Pastel.bold(ci.comment)} "
       puts "#{Pastel.bright_blue(ci.user.name)}- #{Pastel.yellow(ci.comment_timestamp)} "
       puts "" 

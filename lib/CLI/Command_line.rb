@@ -28,7 +28,7 @@ class Cli
     Prompt.select('') do |menu|
       menu.choice (option.call 'Login'), -> { login }
       menu.choice (option.call 'Create Username'), -> { create_username }
-      menu.choice (option.call 'Exit'), -> { exit }
+      menu.choice (option.call 'Exit'), -> { exit_message }
     end
   end
 
@@ -76,11 +76,39 @@ end
     Prompt.select('') do |menu|
     menu.choice (option.call "Saved Articles (#{user.favorites.count})"), -> { saved_articles }
     menu.choice (option.call 'Search for new articles'), -> { new_search }
+    menu.choice (option.call 'Settings'), -> { settings }
     menu.choice (option.call 'Logout'), -> { welcome }
-    menu.choice (option.call 'Exit'), -> { exit }
+    menu.choice (option.call 'Exit'), -> { exit_message }
+    end
   end
-end
 
+  def settings
+    system "clear"
+    Prompt.select('') do |menu|
+      menu.choice (option.call "Change Name"), -> { change_name }
+      menu.choice (option.call 'Delete Account'), -> { delete_account }
+      menu.choice (option.call 'Go Back'), -> { main_menu }
+    end
+  end
+
+  def change_name
+    system "clear"
+    puts "Enter new username"
+    new_name = gets.chomp.downcase.to_s
+    @user.update(name: new_name)
+    Prompt.select('') do |menu|
+      menu.choice (option.call 'Go Back'), -> { main_menu }
+    end
+  end
+
+  def delete_account
+  fav = Favorite.where(user_id: @user.id)
+  fav.destroy_all
+  com = Comment.where(user_id: @user.id)
+  com.destroy_all
+   @user.destroy
+    welcome
+  end
 
 
   def new_search
@@ -93,7 +121,7 @@ end
     # menu.choice 'Search by Description', -> { articles_by_description }
     menu.choice (option.call 'Search by Keyword'), -> { articles_by_keyword }
     menu.choice (option.call 'Return to main menu'), -> { main_menu }
-    menu.choice (option.call 'Exit'), -> { exit }
+    menu.choice (option.call 'Exit'), -> { exit_message }
   end
 end
 
@@ -124,6 +152,7 @@ def trending
   end
   menu.choice (option.call "Go back"), -> {new_search}
   end
+  display article
   Prompt.select('') do |menu|
     menu.choice (option.call "New search"), -> {new_search}
     menu.choice (option.call "Go back"), -> {trending}
@@ -200,6 +229,7 @@ def save answer
     menu.choice (option.call 'Save')
     menu.choice (option.call 'New search'), -> {new_search}
     menu.choice (option.call 'New comment'), -> {new_comment}
+    menu.choice (option.call 'Main Menu'), -> {main_menu}
   end
   if user_response == (option.call 'Save')
     if Favorite.find_by(user_id: @user.id,article_id: selected_article.id)
@@ -230,4 +260,15 @@ def display article
   puts " "
   Comment.comment_by_article(article)
   end
+
+  def exit_message
+    system "clear"
+    puts Pastel.bold("Have a nice day")
+    exit
+  end
+
+
+
+
+
 end
