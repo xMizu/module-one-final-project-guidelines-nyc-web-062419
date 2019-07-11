@@ -103,7 +103,7 @@ def all_stories
   puts header.call "Here are all stories"
   Prompt.select(" ", per_page: 40) do |menu|
     Article.sort_all.each do |articles|
-      menu.choice (articles.title), -> {save articles}
+      menu.choice (articles.title), -> {save articles.title}
     end
     menu.choice (option.call "Go back"), -> {new_search}
   end
@@ -118,12 +118,12 @@ def trending
   system "clear"
   puts header.call "Here are todays trending stories"
   puts " "
-  Prompt.select(" ", per_page: 200) do |menu|
+  user_choice = Prompt.select(" ", per_page: 200) do |menu|
   Article.sort_by_recent.each do |articles|
-  menu.choice (articles.title), -> {save articles}
-end
+  menu.choice (articles.title), -> {save articles.title}
+  end
   menu.choice (option.call "Go back"), -> {new_search}
-end
+  end
   Prompt.select('') do |menu|
     menu.choice (option.call "New search"), -> {new_search}
     menu.choice (option.call "Go back"), -> {trending}
@@ -190,7 +190,7 @@ end
 end
 
 
-def save(answer)
+def save answer
   selected_article = Article.find_by(title: answer)
   system "clear"
   display selected_article
