@@ -4,18 +4,18 @@ class Cli
 
   Prompt = TTY::Prompt.new
   Pastel = Pastel.new
-  
+
   def header
    Pastel.magenta.bold.underline.detach
   end
 
   def option
-    Pastel.green.detach
+    Pastel.detach
   end
 
-  def selection
-    Pastel.bright_black.italic.detach
-  end
+  # def selection
+  #   Pastel.bright_black.italic.detach
+  # end
 
   def welcome
     system 'clear'
@@ -103,7 +103,7 @@ def all_stories
   puts header.call "Here are all stories"
   Prompt.select(" ", per_page: 40) do |menu|
     Article.sort_all.each do |articles|
-      menu.choice (selection.call "#{articles.title}"), -> {save articles}
+      menu.choice (articles.title), -> {save articles}
     end
     menu.choice (option.call "Go back"), -> {new_search}
   end
@@ -120,7 +120,7 @@ def trending
   puts " "
   Prompt.select(" ", per_page: 200) do |menu|
   Article.sort_by_recent.each do |articles|
-  menu.choice (selection.call "#{articles.title}"), -> {save articles}
+  menu.choice (articles.title), -> {save articles}
 end
   menu.choice (option.call "Go back"), -> {new_search}
 end
@@ -150,7 +150,7 @@ def articles_by_keyword
   else
     answer = Prompt.select('', per_page: 200) do |menu|
       search.each do |search_result|
-        menu.choice (selection.call search_result.title)
+        menu.choice (search_result.title)
       end
       menu.choice (option.call 'Search by Keyword'), -> { articles_by_keyword }
       menu.choice (option.call 'Return to main menu'), -> { main_menu }
@@ -158,30 +158,40 @@ def articles_by_keyword
 
   end
   save answer
-  saved_articles
+  Prompt.select('') do |menu|
+    menu.choice (option.call "See Favorites"), -> {saved_articles}
+    menu.choice (option.call "Go back"), -> {articles_by_keyword}
+    menu.choice (option.call "Main Menu"), -> {main_menu}
+  end
 end
 
 def saved_articles
   system "clear"
   puts header.call "Here are your favorited stories "
   puts " "
-  respsonse = Prompt.select('', per_page: 200) do |menu|
-    User.find_by(id: @user.id).articles.each do |article|
-      menu.choice (selection.call article.title), -> {display article}
+  response = Prompt.select('', per_page: 200) do |menu|
+    User.find_by(id: @user.id).articles.map do |article|
+      menu.choice (article.title), -> {display article}
     end
-      menu.choice (option.call 'Return to menu'), -> { main_menu }
+      menu.choice ('Return to menu'), -> { main_menu }
     end
     Prompt.select('') do |menu|
       menu.choice (option.call "Read more online"), -> {system "open", article.url}
+      menu.choice (option.call 'New comment'), -> {new_comment}
       menu.choice (option.call "Go back"), -> {saved_articles}
       menu.choice (option.call "Remove from favorites"), -> {Favorite.delete(Favorite.where(user_id: @user.id,article_id: @article.id))}
+      menu.choice (option.call "Main Menu"), -> {main_menu}
     end
-  saved_articles
+  display @article
+  user_response = Prompt.select('') do |menu|
+    menu.choice (option.call 'Go back'), -> {saved_articles}
+    menu.choice (option.call 'Main menu'), -> {main_menu}
+end
 end
 
 
 def save(answer)
-  selected_article = Article.find_by(title: answer.title)
+  selected_article = Article.find_by(title: answer)
   system "clear"
   display selected_article
   puts " "
@@ -189,14 +199,20 @@ def save(answer)
   user_response = Prompt.select('') do |menu|
     menu.choice (option.call 'Save')
     menu.choice (option.call 'New search'), -> {new_search}
+    menu.choice (option.call 'New comment'), -> {new_comment}
   end
-  if user_response == (option.call "Save")
+  if user_response == (option.call 'Save')
     if Favorite.find_by(user_id: @user.id,article_id: selected_article.id)
       puts "Already saved!"
     else Favorite.create(user_id: @user.id,article_id: selected_article.id)
       puts "Saved!"
     end
   end
+end
+
+def new_comment
+  user_comment = gets.chomp.to_s
+  Comment.create(article_id: @article.id, user_id: @user.id, comment: user_comment, comment_timestamp: Time.now)
 end
 
 def display article
@@ -208,12 +224,10 @@ def display article
   puts " "
   puts header.call "Description"
   puts " "
-  if article.description.class == String
-    puts article.description
+  # if article.description.class == String
+  puts article.description
+  puts header.call "Comments"
+  puts " "
+  Comment.comment_by_article(article)
   end
-end
-
-
-
-
 end
