@@ -19,7 +19,7 @@ class Cli
 
   def welcome
     system 'clear'
-    puts header.call "Welcome to Flatiron News"
+    puts header.call "Welcome to Ruby QuickNews"
     puts "Please login or create a new username"
     login_menu
   end
