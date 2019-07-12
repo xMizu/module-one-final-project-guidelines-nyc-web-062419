@@ -188,7 +188,7 @@ def articles_by_keyword
 
   end
   save answer
-  display article
+  save answer
   Prompt.select('') do |menu|
     menu.choice (option.call "See Favorites"), -> {saved_articles}
     menu.choice (option.call "Go back"), -> {articles_by_keyword}

@@ -1,6 +1,6 @@
 # Ruby QuickNews
 
-This a program created to connect users with the latest trending news in various countries (United States, United Kingdom, and Canada). We also implemented a comment section for our users to get to know one another and are able to be informed on the go. 
+This app give users access to trending news from various countries. It also connect users with one another through the comment section. The app is tailored for people who are on the go but still want to keep connected to world events. 
 
 ## Features
  - Create User profile
