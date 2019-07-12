@@ -1,4 +1,5 @@
 require 'bundler'
+require 'dotenv/load'
 Bundler.require
 
 ActiveRecord::Base.logger = nil
